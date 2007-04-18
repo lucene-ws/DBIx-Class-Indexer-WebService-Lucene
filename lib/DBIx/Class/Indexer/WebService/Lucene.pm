@@ -266,6 +266,9 @@ sub setup_fields {
 
     # look for a field to use for "updated"
     my $mtime_cols = $source->can('mtime_columns') ? $source->mtime_columns : [];
+    if( $source->can( '__column_timestamp_triggers' ) ) {
+        push @$mtime_cols, @{ $source->__column_timestamp_triggers->on_update };
+    }
     for my $mtime_col ( @$mtime_cols ) {
         next unless $fields->{ $mtime_col };
         $fields->{ $mtime_col }->{ role   } = 'updated';
