@@ -77,7 +77,7 @@ WebService::Lucene
 
 =head1 SYNOPSIS
 
-    package foo;
+    package MySchema::Foo;
     
     use base qw( DBIx::Class );
     
@@ -86,13 +86,14 @@ WebService::Lucene
     __PACKAGE__->set_indexer('WebService::Lucene');
     __PACKAGE__->add_columns(
         foo_id => {
-            data_type => 'integer'
+            data_type         => 'integer',
+            is_auto_increment => 1
         },
         name => {
             data_type => 'varchar',
             size      => 10,
             indexed   => {
-                type   => 'text',
+                type => 'text',
             }
         },
         location => {
@@ -109,7 +110,7 @@ WebService::Lucene
             type   => 'unstored'
         },
         widget_updated => {
-            source  => 'widgets.ctime.epoch',
+            source => 'widgets.ctime.epoch',
         },
         author => {
             source => sub {
@@ -119,16 +120,6 @@ WebService::Lucene
             },
         }
     );
-    
-    
-    $foo->name('This is the song that never ends...');
-    $foo->update; # index will automatically be updated
-    
-    
-    # if you're in the group that likes interacting with the index 
-    # manually, all the power to you!
-    $webservice->get_index('fooindx')->add_document($foo->as_document);
-    
     
 =head1 DESCRIPTION
 
@@ -154,7 +145,7 @@ the number of actors associated with the film.
 
 =head2 new( \%connect_info, $source_class )
 
-Instantiates a new Lucene Web Service Indexer. 
+Instantiates a new Lucene Web Service indexer. 
 
 =cut
 
@@ -337,13 +328,12 @@ sub value_for_field {
     }
 }
 
-=head2 as_document ( [ $document ] )
+=head2 as_document( [ $document ] )
 
-If optional document is passed to method, will replaces document's
-current fields with those as outlined by the registered fields of this 
-result set. The optional document is not passed to method, will 
-construct a new WebService::Lucene::Document object, populate it, and 
-return it.
+If a document is passed to the method, it will replaces the document's
+current fields with those outlined by the source's registered fields.
+If no document is passed, it will construct a new
+WebService::Lucene::Document object, populate it, and return it.
 
 =cut
 
@@ -379,10 +369,9 @@ sub as_document {
     return $document;
 }
 
-=head2 insert ( $object )
+=head2 insert( $object )
 
-Calls update_or_create_document(), then calls the super class's insert() 
-method.
+Calls C<update_or_create_document>.
 
 =cut
 
@@ -392,9 +381,9 @@ sub insert {
     $self->update_or_create_document( $object );
 }
 
-=head2 update ( $object )
+=head2 update( $object )
 
-Calls update_or_create_document( $object ).
+Calls C<update_or_create_document>.
 
 =cut
 
@@ -405,9 +394,9 @@ sub update {
     $self->update_or_create_document( $object );
 }
 
-=head2 delete ( $object )
+=head2 delete( $object )
 
-Deletes document from associated index.
+Deletes document from the index.
 
 =cut
 
@@ -424,10 +413,10 @@ sub delete {
     }
 }
 
-=head2 update_or_create_document ( $object )
+=head2 update_or_create_document( $object )
 
-Will either update or add a document to the associated index, depending 
-upon whether or not it already exists within the index.
+Will either update or add a document to the index, depending
+on its existence in the index.
 
 =cut
 
@@ -468,6 +457,8 @@ sub update_or_create_document {
 =over 4
 
 =item * Adam Paynter E<lt>adapay@cpan.orgE<gt>
+
+=item * Brian Cassidy E<lt>bricas@cpan.orgE<gt>
 
 =back
 
