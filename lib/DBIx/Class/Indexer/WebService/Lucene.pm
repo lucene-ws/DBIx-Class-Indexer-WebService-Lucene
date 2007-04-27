@@ -177,13 +177,14 @@ If the index does not yet exist, this method will create it for you.
 sub setup_index {
     my( $self, $source, $index ) = @_;
     
-    my $pk   = $self->field_for_role( $source, 'identifier' );
-    my $name = $index->name;
+    my $pk      = $self->field_for_role( $source, 'identifier' );
+    my $default = $self->connect_info->{ default_field } || $pk;
+    my $name    = $index->name;
     my %properties = (
         'index.defaultoperator' => 'AND',
         'index.summary'         => $name,
         'index.title'           => $name,
-        'field.<default>'       => 'all',
+        'field.<default>'       => $default,
         'field.identifier'      => $pk,
         'field.<title>'         => "[$pk]",
     );
