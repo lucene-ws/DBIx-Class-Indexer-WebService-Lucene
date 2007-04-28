@@ -178,7 +178,9 @@ sub setup_index {
     my( $self, $source, $index ) = @_;
     
     my $pk      = $self->field_for_role( $source, 'identifier' );
-    my $default = $source->indexer_connection_info->{ default_field } || $pk;
+    my $default = $source->indexer_connection_info->{ default_field }
+        || $self->field_for_role( $source, 'default_field' )
+        || $pk;
     my $name    = $index->name;
     my %properties = (
         'index.defaultoperator' => 'AND',
