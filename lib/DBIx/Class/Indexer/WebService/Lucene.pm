@@ -8,7 +8,7 @@ use WebService::Lucene::Document;
 use WebService::Lucene::Field;
 use WebService::Lucene::Index;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw( DBIx::Class::Indexer DBIx::Class );
 
@@ -118,6 +118,15 @@ WebService::Lucene
                     join ' ', $_->first_name, $_->last_name
                 } shift->authors
             },
+        },
+        all => {
+            source => sub {
+                my $self = shift;
+                join ' ', map { $self->$_ } qw( name location );
+            }
+            type => 'unstored',
+            role => 'default_field' # will be search if no field prefix
+                                    # is specified
         }
     );
     
@@ -140,7 +149,6 @@ the number of actors associated with the film.
         },
     );
     
-
 =head1 METHODS
 
 =head2 new( \%connect_info, $source_class )
