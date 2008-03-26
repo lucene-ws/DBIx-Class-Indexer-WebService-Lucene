@@ -419,9 +419,8 @@ sub delete {
     $self->setup_fields( ref $object );
     my $id = $self->value_for_field( $object, $self->field_for_role( ref $object, 'identifier' ) );
     
-    if ( my $document = eval { $index->get_document( $id ) } ) {
-        $document->delete;
-    }
+    my $document = eval { $index->get_document( $id ) };
+    $document->delete if $document;
 }
 
 =head2 update_or_create_document( $object )
@@ -439,7 +438,8 @@ sub update_or_create_document {
     $self->setup_fields( ref $object );
     my $id = $self->value_for_field( $object, $self->field_for_role( ref $object, 'identifier' ) );
 
-    if ( my $document = eval { $index->get_document( $id ) } ) {
+    my $document = eval { $index->get_document( $id ) };
+    if ( $document ) {
         $document->clear_fields;
         $self->as_document( $object, $document );
         $document->update;
